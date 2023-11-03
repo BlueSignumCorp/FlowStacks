@@ -18,7 +18,7 @@ public enum Route<Screen> {
   /// - Parameter embedInNavigationView: whether the presented screen should be embedded in a `NavigationView`.
   /// - Parameter onDismiss: A closure to be invoked when the screen is dismissed.
   @available(OSX, unavailable, message: "Not available on OS X.")
-  case cover(Screen, embedInNavigationView: Bool, onDismiss: (() -> Void)? = nil)
+  case cover(Screen, embedInNavigationView: Bool, disableAnimation: Bool, onDismiss: (() -> Void)? = nil)
   
   /// The root of the stack. The presentation style is irrelevant as it will not be presented.
   /// - Parameter screen: the screen to be shown.
@@ -30,7 +30,7 @@ public enum Route<Screen> {
   public var screen: Screen {
     get {
       switch self {
-      case .push(let screen), .sheet(let screen, _, _), .cover(let screen, _, _):
+      case .push(let screen), .sheet(let screen, _, _), .cover(let screen, _, _, _):
         return screen
       }
     }
@@ -42,8 +42,8 @@ public enum Route<Screen> {
         self = .sheet(newValue, embedInNavigationView: embedInNavigationView, onDismiss: onDismiss)
         #if os(macOS)
         #else
-        case .cover(_, let embedInNavigationView, let onDismiss):
-          self = .cover(newValue, embedInNavigationView: embedInNavigationView, onDismiss: onDismiss)
+        case .cover(_, let embedInNavigationView, let disableAnimation, let onDismiss):
+          self = .cover(newValue, embedInNavigationView: embedInNavigationView, disableAnimation: disableAnimation, onDismiss: onDismiss)
       #endif
       }
     }
@@ -54,7 +54,7 @@ public enum Route<Screen> {
     switch self {
     case .push:
       return false
-    case .sheet(_, let embedInNavigationView, _), .cover(_, let embedInNavigationView, _):
+    case .sheet(_, let embedInNavigationView, _), .cover(_, let embedInNavigationView, _, _):
       return embedInNavigationView
     }
   }
@@ -77,8 +77,8 @@ public enum Route<Screen> {
       return .sheet(transform(screen), embedInNavigationView: embedInNavigationView, onDismiss: onDismiss)
 #if os(macOS)
 #else
-    case .cover(_, let embedInNavigationView, let onDismiss):
-      return .cover(transform(screen), embedInNavigationView: embedInNavigationView, onDismiss: onDismiss)
+    case .cover(_, let embedInNavigationView, let disableAnimation, let onDismiss):
+      return .cover(transform(screen), embedInNavigationView: embedInNavigationView, disableAnimation: disableAnimation, onDismiss: onDismiss)
 #endif
     }
   }

@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 public extension RoutableCollection where Element: RouteProtocol {
   /// Whether the Array of Routes is able to push new screens. If it is not possible to determine,
@@ -50,8 +51,8 @@ public extension RoutableCollection where Element: RouteProtocol {
   /// - Parameter screen: The screen to push.
   /// - Parameter onDismiss: A closure to be invoked when the screen is dismissed. 
   @available(OSX, unavailable, message: "Not available on OS X.")
-  mutating func presentCover(_ screen: Element.Screen, embedInNavigationView: Bool = false, onDismiss: (() -> Void)? = nil) {
-    _append(element: .cover(screen, embedInNavigationView: embedInNavigationView, onDismiss: onDismiss))
+  mutating func presentCover(_ screen: Element.Screen, embedInNavigationView: Bool = false, disableAnimation: Bool = false, onDismiss: (() -> Void)? = nil) {
+    _append(element: .cover(screen, embedInNavigationView: embedInNavigationView, disableAnimation: disableAnimation, onDismiss: onDismiss))
   }
   #endif
 }
@@ -280,7 +281,7 @@ public extension RoutableCollection where Element: RouteProtocol {
   /// Dismisses a given number of presentation layers off the stack. Only screens that have been presented will
   /// be included in the count.
   /// - Parameter count: The number of presentation layers to go back. Defaults to 1.
-  mutating func dismiss(count: Int = 1) {
+  mutating func dismiss(count: Int = 1, animationDisabled: Bool = false) {
     assert(count >= 0)
     var index = endIndex - 1
     var dismissed = 0
@@ -295,6 +296,9 @@ public extension RoutableCollection where Element: RouteProtocol {
         dismissed += 1
       }
       index -= 1
+    }
+    if animationDisabled {
+      UIView.setAnimationsEnabled(false)
     }
     goBackTo(index: index)
   }

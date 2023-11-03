@@ -10,7 +10,7 @@ public protocol RouteProtocol {
 #if os(macOS)
 // Full-screen cover unavailable.
 #else
-  static func cover(_ screen: Screen, embedInNavigationView: Bool, onDismiss: (() -> Void)?) -> Self
+  static func cover(_ screen: Screen, embedInNavigationView: Bool, disableAnimation: Bool, onDismiss: (() -> Void)?) -> Self
 #endif
   var screen: Screen { get set }
   var embedInNavigationView: Bool { get }
@@ -33,7 +33,13 @@ public extension RouteProtocol {
   /// - Parameter screen: the screen to be shown.
   @available(OSX, unavailable, message: "Not available on OS X.")
   static func cover(_ screen: Screen) -> Self {
-    return cover(screen, embedInNavigationView: false, onDismiss: nil)
+    return cover(screen, embedInNavigationView: false, disableAnimation: false, onDismiss: nil)
+  }
+  /// A full-screen cover presentation.
+  /// - Parameter screen: the screen to be shown.
+  @available(OSX, unavailable, message: "Not available on OS X.")
+  static func cover(_ screen: Screen, disableAnimation: Bool) -> Self {
+    return cover(screen, embedInNavigationView: false, disableAnimation: disableAnimation, onDismiss: nil)
   }
 #endif
   

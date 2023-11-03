@@ -5,7 +5,7 @@ extension View {
   /// A shim for presenting a full-screen cover that falls back on a sheet presentation on platforms
   /// where fullScreenCover is unavailable.
   @ViewBuilder
-  func cover<Content: View>(isPresented: Binding<Bool>, onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) -> some View {
+  func cover<Content: View>(isPresented: Binding<Bool>, disableAnimation: Bool = false, onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) -> some View {
     #if os(macOS)
       self
         .sheet(
@@ -18,9 +18,16 @@ extension View {
         self
           .fullScreenCover(
             isPresented: isPresented,
-            onDismiss: onDismiss,
+            onDismiss: {
+              UIView.setAnimationsEnabled(true)
+              onDismiss?()
+            },
             content: content
           )
+          .transaction { transaction in
+            transaction.disablesAnimations = disableAnimation
+          }
+          
       } else {
         self
           .sheet(

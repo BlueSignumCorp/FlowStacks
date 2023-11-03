@@ -49,7 +49,7 @@ indirect enum Node<Screen, V: View>: View {
 
   private var onDismiss: (() -> Void)? {
     switch next {
-    case .route(.sheet(_, _, let onDismiss), _, _, _, _), .route(.cover(_, _, let onDismiss), _, _, _, _):
+    case .route(.sheet(_, _, let onDismiss), _, _, _, _), .route(.cover(_, _, _, let onDismiss), _, _, _, _):
       return onDismiss
     default:
       return nil
@@ -62,6 +62,15 @@ indirect enum Node<Screen, V: View>: View {
       return isActiveBinding
     default:
       return .constant(false)
+    }
+  }
+  
+  private var disableAnimation: Bool {
+    switch next {
+    case .route(.cover(_, _, let disableAnimation, _), _, _, _, _):
+      return disableAnimation
+    default:
+      return false
     }
   }
 
@@ -114,6 +123,7 @@ indirect enum Node<Screen, V: View>: View {
         )
         .cover(
           isPresented: coverBinding,
+          disableAnimation: disableAnimation,
           onDismiss: onDismiss,
           content: { next }
         )
@@ -154,3 +164,5 @@ private var supportedNavigationViewStyle: some NavigationViewStyle {
     .stack
   #endif
 }
+
+import Combine
